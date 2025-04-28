@@ -1,177 +1,108 @@
 import random
 
-class Deck():
-    '''
-    Represents a deck of 52 cards.
-    '''
+# Constants for card values and game rules
+CARD_VALUES = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 10, 'Q': 10, 'K': 10, 'A': 11}
+DEALER_STAND_VALUE = 17
+BLACKJACK_VALUE = 21
 
-    def __init__(self):
-        class Card():
-            '''
-            Represents and individual card of a deck with attributes of a face (or number), suit, and value.
-            '''
+def create_deck():
+    """Create a shuffled deck of cards."""
+    ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+    suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
+    deck = [(rank, suit) for suit in suits for rank in ranks]
+    random.shuffle(deck)
+    return deck
 
-            def __init__(self, suit, value, face):
-                self.suit = suit
-                self.value = value
-                self.face = face
-                self.image_map = str(self.face) + "_of_" + self.suit + '.svg'
+def card_value(card):
+    """Return the value of a card."""
+    return CARD_VALUES[card[0]]
 
-        self.suits = ['clubs', 'spades', 'hearts', 'diamonds']
-        self.faces = ['jack', 'queen', 'king']
-        self.number_cards = [Card(suit, value, value) for value in range(2, 11) for suit in self.suits]
-        self.face_cards = [Card(suit, 10, face) for face in self.faces for suit in self.suits]
-        self.ace_cards = [Card(suit, 11, 'ace') for suit in self.suits]
-        self.cards = self.face_cards + self.number_cards + self.ace_cards
+def calculate_hand_value(hand):
+    """Calculate the value of a hand, adjusting for Aces."""
+    value = sum(card_value(card) for card in hand)
+    aces = sum(1 for card in hand if card[0] == 'A')
+    while value > BLACKJACK_VALUE and aces:
+        value -= 10
+        aces -= 1
+    return value
 
-class Hand():
-    def __init__(self, id):
-        self.cards = []
-        self.id = id
-        self.total = 0
-        self.bust = False
-        self.door_value = None
-        self.bet = 0
-        self.active = False
-        self.can_double = True
+def display_hand(hand, hidden=False):
+    """Return a list of card strings.  Hide the first card if hidden is True."""
+    if hidden:
+        return ["Hidden", f"{hand[1][0]} of {hand[1][1]}"]
+    else:
+        return [f"{rank} of {suit}" for rank, suit in hand]
 
-    def __check_bust(self):
-        '''
-        Updates the bust attribute to True if the total attribute exceeds 21
-        '''
-        if self.total > 21:
-            self.bust = True
+def get_initial_hands(deck):
+    """Deal the initial hands for a new game."""
+    player_hand = [deck.pop(), deck.pop()]
+    dealer_hand = [deck.pop(), deck.pop()]
+    return player_hand, dealer_hand, deck
 
-    def __update_door_value(self):
-        '''
-        Updates door value for the face value of the the first card in the hand.
-        This is the "door card" for the dealer in the first round
-        '''
-        self.door_value = self.cards[0].value
+def determine_winner(player_hand, dealer_hand):
+    """Determine the winner of the game."""
+    player_value = calculate_hand_value(player_hand)
+    dealer_value = calculate_hand_value(dealer_hand)
 
-    def __update_total(self):
-        '''
-        Recalculates the total attribute to include a new card. If the card is an ace it counts as 11 or 1 points,
-        whichever does not make the player bust
-        '''
+    if player_value > BLACKJACK_VALUE:
+        return 'dealer'  # Player busts
+    elif dealer_value > BLACKJACK_VALUE:
+        return 'player'  # Dealer busts
+    elif player_value > dealer_value:
+        return 'player'
+    elif dealer_value > player_value:
+        return 'dealer'
+    else:
+        return 'tie'
 
-        if 'ace' in [card.face for card in self.cards]:
-            non_ace_total = sum([card.value for card in self.cards if card.face != 'ace'])
-            running_total = non_ace_total
+def dealer_play(dealer_hand, deck):
+    """Dealer's strategy: Hit until 17 or more."""
+    while calculate_hand_value(dealer_hand) < DEALER_STAND_VALUE:
+        dealer_hand.append(deck.pop())
+    return dealer_hand, deck
 
-            for card in self.cards:
-                if card.face == 'ace':
+if __name__ == '__main__':
+    """Main function to play Blackjack."""
+    deck = create_deck()
+    player_hand, dealer_hand, deck = get_initial_hands(deck)
 
-                    if (running_total + card.value) > 21:
-                        running_total += 1
-                    else:
-                        running_total += 11
+    print("\nYour hand:")
+    print(display_hand(player_hand))
+    print("Dealer's hand:")
+    print(display_hand(dealer_hand, hidden=True))
 
-            self.total = running_total
-
+    # Player's turn
+    while True:
+        player_value = calculate_hand_value(player_hand)
+        if player_value > BLACKJACK_VALUE:
+            print("\nYou busted! Dealer wins.")
+            exit()
+        move = input("\nDo you want to [hit] or [stand]? ").lower()
+        if move == 'hit':
+            player_hand.append(deck.pop())
+            print("\nYour hand:")
+            print(display_hand(player_hand))
+        elif move == 'stand':
+            break
         else:
-            self.total = sum([card.value for card in self.cards])
+            print("Invalid input. Please type 'hit' or 'stand'.")
 
-    def add_card(self, card):
-        '''
-        Adds a card to the hand
-        '''
-        self.cards.append(card)
-        self.__update_total()
-        self.__update_door_value()
-        self.__check_bust()
+    # Dealer's turn
+    print("\nDealer's turn:")
+    print(display_hand(dealer_hand))
+    dealer_hand, deck = dealer_play(dealer_hand, deck)
+    print("\nDealer's hand:")
+    print(display_hand(dealer_hand))
 
-class Player:
-    '''
-    Represents a blackjack player
-    '''
+    # Determine winner
+    print("\nFinal Hands:")
+    print("Your hand:", display_hand(player_hand))
+    print("Dealer's hand:", display_hand(dealer_hand))
 
-    def __init__(self):
-        self.hands = {}
-        self.total = 0
-        self.bust = False
-        self.bank = 100
-
-    def can_split(self):
-        '''
-        Determine if the first two cards dealt to the player are the same. If they are the same, the player
-        will be given the option to split
-        '''
-        return True if len(set([card.value for card in self.hands[0]])) == 1 else False
-
-    def split(self):
-        '''
-        Splits the players hand
-        '''
-        pass
-
-    def add_hand(self, hand_id):
-        '''
-        Adds a hand to the player object
-        '''
-        hand_key = hand_id
-        self.hands[hand_key] = Hand(hand_id)
-
-    def split_cards(self):
-        '''
-        Takes first card from first hand and moves it to the second hand
-        '''
-        hand_one = self.hands[1]
-        first_card = hand_one.cards[0]
-        second_card = hand_one.cards[1]
-        hand_one.total = first_card.value
-        hand_two = self.hands[2]
-        hand_two.cards.append(second_card)
-        hand_two.total = second_card.value
-        hand_two.bet = hand_one.bet
-        hand_one.cards.remove(second_card)
-
-class Dealer(Player):
-    '''
-    Represents the dealer, inherits from the "Player" class.
-    '''
-
-    def __init__(self):
-        super().__init__()
-        self.hands = {1 : Hand(1)}
-
-    def get_hole_card(self):
-        '''
-        Returns the second card dealt to the dealers hand
-        '''
-        return self.hands[1].cards[1]
-
-class Game():
-    '''
-    Represents the blackjack game.
-    '''
-
-    def __init__(self, Dealer, Deck, Player):
-
-        self.deck = Deck().cards
-        self.player = Player()
-        self.dealer = Dealer()
-        self.round = 1
-
-    def draw_card(self, target, hand_id):
-        '''
-        Draws a card from the deck and adds it to either the dealer or player (the target)
-        '''
-        card_draw = random.choice(self.deck)
-        self.deck.remove(card_draw)
-
-        if target == 'player':
-            self.player.hands[hand_id].add_card(card_draw)
-
-        elif target == 'dealer':
-            self.dealer.hands[hand_id].add_card(card_draw)
-
-        return card_draw
-
-    def new_deck(self):
-        '''
-        Adds a fresh deck to the game
-        '''
-        self.deck = Deck().cards
-
-
+    winner = determine_winner(player_hand, dealer_hand)
+    if winner == 'player':
+        print("\nYou win!")
+    elif winner == 'dealer':
+        print("\nDealer wins!")
+    else:
+        print("\nIt's a tie!")
