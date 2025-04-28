@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container h-100">
+    <!-- Start of Main Row -->
+    <div class="row h-100">
+        <!-- Start of Card Column -->
+        <div class="col-sm-8 h-100" id="hands-container">
+            <div class="row h-10" id="dealer-counts">
+
+            </div>
+            <div class="row h-25" id="dealer-hands">
+            </div>
+            <div class="row" id="player-counts">
+
+            </div>
+            <div class="row h-25" id="player-hands">
+
+            </div>
+            <div class="row" id="player-bets">
+
+            </div>
+            <div class="row mt-2" id="player-controls">
+
+            </div>
+        </div>
+        <!-- End of Card Column -->
+        <!-- Start of Dashboard Column -->
+        <div class="col-sm-4 h-100" id="dashboard">
+            <div class="row h-25">
+                <!-- Start of Bank Roll Column -->
+                <div class="col text-center">
+                    <div class="card text-center">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <img src="static/images/misc/audio.png" width="25" height="25" id="audio"
+                                         onclick="toggleMusic(song)">
+                                </div>
+                                <div class="col-sm-4 text-center">
+                                    Bank Roll
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h1 id="bank-roll">$100</h1>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Bank Roll Column -->
+            </div>
+            <div class="row h-25">
+                <div class="col align-self-center" id="game-button-container">
+                </div>
+                <div class="col align-self-center" id="win-notification-container">
+                </div>
+            </div>
+            <div class="row h-25">
+                <!-- Start of Chips Column -->
+                <div class="col-sm-12 text-center">
+                    <div id="chips" class="card">
+                        <div class="card-header" id="bet-header">
+                            Place Your Bet
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <img src="static/images/chips/one.png" class="rounded" width="75"
+                                     height="75" onclick="chipAudio();socket.emit('add_bet', 1, 1)">
+
+                                <img src="static/images/chips/five.png" class="rounded" width="75"
+                                     height="75" onclick="chipAudio();socket.emit('add_bet', 5, 1)">
+
+                                <img src="static/images/chips/ten.png" class="rounded" width="75"
+                                     height="75" onclick="chipAudio();socket.emit('add_bet', 10, 1)">
+
+                            </div>
+                            <div>
+
+                                <img src="static/images/chips/twenty.png" class="rounded" width="75"
+                                     height="75" onclick="chipAudio();socket.emit('add_bet', 20, 1)">
+
+                                <img src="static/images/chips/forty.png" class="rounded" width="75"
+                                     height="75" onclick="chipAudio();socket.emit('add_bet', 40, 1)">
+
+                                <img src="static/images/chips/eighty.png" class="rounded" width="75"
+                                     height="75" onclick="chipAudio();socket.emit('add_bet', 80, 1)">
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Chips Column -->
+            </div>
+        </div>
+        <!-- End of Dashboard Column -->
+    </div>
+    <!-- End of Main Row -->
+</div>
+<!-- The Modal -->
+<div class="modal" id="minBet">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Minimum Bet Required</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body text-center">
+                Please place at least a $1 bet...
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

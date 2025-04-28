@@ -1,0 +1,110 @@
+
+body {
+  background-image: url("/static/images/background/background.jpg");
+}
+
+
+html,body{
+    height:100%;
+}
+
+/* position play cards off screen for transition to in screen at deal */
+
+.play-card {
+
+position:relative;
+left:-300px;
+margin: 3px;
+
+}
+
+
+/* make rounded chips slightly transparent when you hover over them */
+.rounded:hover {
+  opacity: 0.3 !important;
+}
+
+
+
+/* apply margin to all control buttons */
+
+.control-button {
+
+    margin-right: 5px;
+    margin-left: 5px;
+
+}
+
+/* circle for the player and dealer count total */
+
+.count-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 25px;
+  color: #000;
+  line-height: 50px;
+  text-align: center;
+  background: #bbb;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+/* circle for the player bet totals */
+
+.bet-circle {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  font-size: 25px;
+  color: #000;
+  line-height: 75px;
+  text-align: center;
+  background: #FFFFFF;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+/* title for dealer total or player total */
+
+.count-title {
+
+    font-size: 25px;
+    font-weight: bold;
+    color: #FFFFFF
+
+}
+
+/* centers notification images */
+
+.notification-image {
+
+position: absolute !important;
+top: 0 !important;
+left: 0 !important;
+right: 0 !important;
+bottom: 0 !important;
+margin: auto !important;
+
+}
+
+
+/* creates overlap for dealt card images */
+
+.hand img {
+    margin-left: -10%;
+}
+
+.hand img:first-child {
+    margin-left: 0px;
+}
+
+.control-button {
+
+    margin-bottom: 5px;
+
+}
+
+
+
+
