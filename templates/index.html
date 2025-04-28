@@ -1,123 +1,288 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="container h-100">
-    <!-- Start of Main Row -->
-    <div class="row h-100">
-        <!-- Start of Card Column -->
-        <div class="col-sm-8 h-100" id="hands-container">
-            <div class="row h-10" id="dealer-counts">
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #282828; /* Dark gray background */
+            color: #eeeeee; /* Light gray text */
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 12px;
+            background-color: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #4a4a4a;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #ffb800; /* A more vibrant yellow */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        #scores {
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            color: #ffffff;
+        }
+        #hands {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .hand-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40%; /* Adjusted width for wrapping */
+            min-width: 250px; /* Minimum width for each hand container */
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #ffb800;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        #player-hand, #dealer-hand {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            width: 90px;
+            height: 130px;
+            border-radius: 8px;
+            border: 2px solid #000000;
+            background-color: #ffffff;
+            color: #282828;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: scale(1.04);
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .hidden {
+            background-color: #282828;
+            color: #282828;
+            border: 2px solid #000000;
+        }
+        #message {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #ffffff;
+            min-height: 2em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 25px;
+            border-radius: 6px;
+            background-color: #ffb800;
+            color: #000000;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        button:hover {
+            background-color: #e5a500;
+            transform: scale(1.03);
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+        }
+        button:disabled {
+            background-color: #999999;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+         button:disabled:hover {
+            background-color: #999999;
+            transform: none;
+            box-shadow: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 20px auto;
+            }
+            #hands {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .hand-container {
+                width: 100%;
+                min-width: auto;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            .card {
+                width: 80px;
+                height: 120px;
+                font-size: 1.2em;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            #scores {
+                font-size: 1em;
+                gap: 15px;
+            }
+            #message {
+                font-size: 1.1em;
+            }
+            .button-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Blackjack</h1>
+        <div id="scores">
+            <p>Player Score: <span id="player-score">{{ player_score }}</span></p>
+            <p>Dealer Score: <span id="dealer-score">{{ dealer_score }}</span></p>
+        </div>
+        <div id="hands">
+            <div class="hand-container">
+                <h2>Player Hand:</h2>
+                <div id="player-hand">
+                    {% for card in player_hand %}
+                        <div class="card">{{ card }}</div>
+                    {% endfor %}
+                </div>
+                 <p>Player Value: <span id="player-value"></span></p>
             </div>
-            <div class="row h-25" id="dealer-hands">
-            </div>
-            <div class="row" id="player-counts">
-
-            </div>
-            <div class="row h-25" id="player-hands">
-
-            </div>
-            <div class="row" id="player-bets">
-
-            </div>
-            <div class="row mt-2" id="player-controls">
-
+            <div class="hand-container">
+                <h2>Dealer Hand:</h2>
+                <div id="dealer-hand">
+                    {% for card in dealer_hand %}
+                        <div class="card {% if loop.first and game_over == false %}hidden{% endif %}">{{ card }}</div>
+                    {% endfor %}
+                </div>
+                <p>Dealer Value: <span id="dealer-value"></span></p>
             </div>
         </div>
-        <!-- End of Card Column -->
-        <!-- Start of Dashboard Column -->
-        <div class="col-sm-4 h-100" id="dashboard">
-            <div class="row h-25">
-                <!-- Start of Bank Roll Column -->
-                <div class="col text-center">
-                    <div class="card text-center">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <img src="static/images/misc/audio.png" width="25" height="25" id="audio"
-                                         onclick="toggleMusic(song)">
-                                </div>
-                                <div class="col-sm-4 text-center">
-                                    Bank Roll
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h1 id="bank-roll">$100</h1>
-                        </div>
-                    </div>
-                </div>
-                <!-- End of Bank Roll Column -->
-            </div>
-            <div class="row h-25">
-                <div class="col align-self-center" id="game-button-container">
-                </div>
-                <div class="col align-self-center" id="win-notification-container">
-                </div>
-            </div>
-            <div class="row h-25">
-                <!-- Start of Chips Column -->
-                <div class="col-sm-12 text-center">
-                    <div id="chips" class="card">
-                        <div class="card-header" id="bet-header">
-                            Place Your Bet
-                        </div>
-                        <div class="card-body">
-                            <div>
-                                <img src="static/images/chips/one.png" class="rounded" width="75"
-                                     height="75" onclick="chipAudio();socket.emit('add_bet', 1, 1)">
-
-                                <img src="static/images/chips/five.png" class="rounded" width="75"
-                                     height="75" onclick="chipAudio();socket.emit('add_bet', 5, 1)">
-
-                                <img src="static/images/chips/ten.png" class="rounded" width="75"
-                                     height="75" onclick="chipAudio();socket.emit('add_bet', 10, 1)">
-
-                            </div>
-                            <div>
-
-                                <img src="static/images/chips/twenty.png" class="rounded" width="75"
-                                     height="75" onclick="chipAudio();socket.emit('add_bet', 20, 1)">
-
-                                <img src="static/images/chips/forty.png" class="rounded" width="75"
-                                     height="75" onclick="chipAudio();socket.emit('add_bet', 40, 1)">
-
-                                <img src="static/images/chips/eighty.png" class="rounded" width="75"
-                                     height="75" onclick="chipAudio();socket.emit('add_bet', 80, 1)">
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <!-- End of Chips Column -->
-            </div>
+        <p id="message">{{ message }}</p>
+        <div class="button-container">
+            {% if not game_over %}
+                <button id="hit-button">Hit</button>
+                <button id="stand-button">Stand</button>
+            {% endif %}
+            <button id="new-game-button">New Game</button>
         </div>
-        <!-- End of Dashboard Column -->
     </div>
-    <!-- End of Main Row -->
-</div>
-<!-- The Modal -->
-<div class="modal" id="minBet">
-    <div class="modal-dialog">
-        <div class="modal-content">
 
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <h4 class="modal-title">Minimum Bet Required</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
+    <script>
+        const socket = io();
+        const playerHandDiv = document.getElementById('player-hand');
+        const dealerHandDiv = document.getElementById('dealer-hand');
+        const messageDisplay = document.getElementById('message');
+        const hitButton = document.getElementById('hit-button');
+        const standButton = document.getElementById('stand-button');
+        const newGameButton = document.getElementById('new-game-button');
+        const playerScoreDisplay = document.getElementById('player-score');
+        const dealerScoreDisplay = document.getElementById('dealer-score');
+        const playerValueDisplay = document.getElementById('player-value');
+        const dealerValueDisplay = document.getElementById('dealer-value');
 
-            <!-- Modal body -->
-            <div class="modal-body text-center">
-                Please place at least a $1 bet...
-            </div>
 
-            <!-- Modal footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
+        let gameOver = {{ game_over|lower }};
 
-        </div>
-    </div>
-</div>
-{% endblock %}
+        if (gameOver) {
+            hitButton.disabled = true;
+            standButton.disabled = true;
+        }
+
+        socket.on('connect', function() {
+            console.log('Connected!');
+            updateDisplay();  // Initial display on connect
+        });
+
+        socket.on('update_game', function(data) {
+            console.log('Received game update:', data);
+            gameOver = data.game_over;
+            updateDisplay(data);
+        });
+
+        function updateDisplay(data = null) {
+            if (data) {
+                playerHandDiv.innerHTML = data.player_hand.map(card => `<div class="card">${card}</div>`).join('');
+                dealerHandDiv.innerHTML = data.dealer_hand.map(card => {
+                    if (data.dealer_hand.indexOf(card) === 0 && !gameOver) {
+                        return `<div class="card hidden">${card}</div>`; // Hidden card
+                    }
+                    return `<div class="card">${card}</div>`;
+                }).join('');
+                messageDisplay.textContent = data.message;
+                playerScoreDisplay.textContent = data.player_score;
+                dealerScoreDisplay.textContent = data.dealer_score;
+
+                playerValueDisplay.textContent = data.player_value;
+
+                dealerValueDisplay.textContent = data.dealer_value;
+
+                if (gameOver) {
+                    hitButton.disabled = true;
+                    standButton.disabled = true;
+                } else {
+                    hitButton.disabled = false;
+                    standButton.disabled = false;
+                }
+            }
+        }
+
+        hitButton.addEventListener('click', function() {
+            socket.emit('player_hit');
+        });
+
+        standButton.addEventListener('click', function() {
+            socket.emit('player_stand');
+        });
+
+        newGameButton.addEventListener('click', function() {
+            socket.emit('start_new_game');
+            hitButton.disabled = false;
+            standButton.disabled = false;
+            gameOver = false; // Reset local gameOver state
+            playerValueDisplay.textContent = '';
+            dealerValueDisplay.textContent = '';
+        });
+    </script>
+</body>
+</html>
