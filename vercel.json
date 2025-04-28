@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "wsgi.py", // Or your main application file
+      "src": "app.py",
       "use": "@vercel/python",
       "config": {
         "pythonVersion": "3.11"
@@ -9,6 +9,6 @@
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "wsgi.py" }
+    { "src": "/(.*)", "dest": "app.py" }
   ]
 }
